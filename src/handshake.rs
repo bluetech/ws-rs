@@ -423,14 +423,14 @@ impl Response {
             .map(|&mut (_, ref mut val)| val)
     }
 
-    /// Access the request headers.
+    /// Access the response headers.
     #[allow(dead_code)]
     #[inline]
     pub fn headers(&self) -> &Vec<(String, Vec<u8>)> {
         &self.headers
     }
 
-    /// Edit the request headers.
+    /// Edit the response headers.
     #[allow(dead_code)]
     #[inline]
     pub fn headers_mut(&mut self) -> &mut Vec<(String, Vec<u8>)> {
