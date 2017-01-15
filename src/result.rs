@@ -26,6 +26,9 @@ pub enum Kind {
     /// If a Connection is active, the WebSocket will automatically attempt to send
     /// a Size (1009) close code.
     Capacity,
+    /// Indicates the client is denied access to the server.
+    /// If this error occurs during a handshake, an HTTP 403 reponse will be generated.
+    Forbidden,
     /// Indicates a violation of the WebSocket protocol.
     /// The WebSocket will automatically attempt to send a Protocol (1002) close code, or if
     /// this error occurs during a handshake, an HTTP 400 reponse will be generated.
@@ -110,6 +113,7 @@ impl StdError for Error {
         match self.kind {
             Kind::Internal          => "Internal Application Error",
             Kind::Capacity          => "WebSocket at Capacity",
+            Kind::Forbidden         => "Access Forbidden",
             Kind::Protocol          => "WebSocket Protocol Error",
             Kind::Encoding(ref err) => err.description(),
             Kind::Io(ref err)       => err.description(),

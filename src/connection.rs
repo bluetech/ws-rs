@@ -291,6 +291,25 @@ impl<H> Connection<H>
                             self.events = Ready::none();
                         }
                     }
+                    Kind::Forbidden => {
+                        let msg = err.to_string();
+                        self.handler.on_error(err);
+                        if let Server = self.endpoint {
+                            res.get_mut().clear();
+                            if let Err(err) = write!(
+                                    res.get_mut(),
+                                    "HTTP/1.1 403 Forbidden\r\n\r\n{}", msg)
+                            {
+                                self.handler.on_error(Error::from(err));
+                                self.events = Ready::none();
+                            } else {
+                                self.events.remove(Ready::readable());
+                                self.events.insert(Ready::writable());
+                            }
+                        } else {
+                            self.events = Ready::none();
+                        }
+                    }
                     _ => {
                         let msg = err.to_string();
                         self.handler.on_error(err);
