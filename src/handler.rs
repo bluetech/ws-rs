@@ -65,6 +65,36 @@ pub trait Handler {
 
     // handshake events
 
+    fn check_origin(&self, req: &Request) -> Result<bool> {
+        let origin = match try!(req.origin()) {
+            None => {
+                // This is a non-browser client; allow.
+                return Ok(true);
+            },
+            Some(origin) => origin,
+        };
+
+        let host = match try!(req.host()) {
+            None => {
+                return Err(Error::new(Kind::Protocol, "The Host header is required."));
+            },
+            Some(host) => host,
+        };
+
+        let origin_url = match url::Url::parse(origin) {
+            Err(err) => {
+                return Err(Error::new(
+                    Kind::Protocol,
+                    format!("Unable to parse Origin as url due to {:?}", err)));
+            },
+            Ok(url) => url,
+        };
+
+        Ok(
+            &origin_url[url::Position::BeforeHost..url::Position::AfterPort] == host
+        )
+    }
+
     /// A method for handling the low-level workings of the request portion of the WebSocket
     /// handshake.
     ///

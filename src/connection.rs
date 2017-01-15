@@ -502,6 +502,9 @@ impl<H> Connection<H>
                     if let Some(_) = try!(self.socket.try_read_buf(req.get_mut())) {
                         if let Some(ref request) = try!(Request::parse(req.get_ref())) {
                             trace!("Handshake request received: \n{}", request);
+                            if !try!(self.handler.check_origin(request)) {
+                                return Err(Error::new(Kind::Forbidden, "The origin is not allowed."));
+                            }
                             let response = try!(self.handler.on_request(request));
                             try!(response.format(res.get_mut()));
                             self.events.remove(Ready::readable());
