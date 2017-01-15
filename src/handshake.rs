@@ -153,6 +153,16 @@ impl Request {
         &mut self.headers
     }
 
+    /// Get the host of the request.
+    #[allow(dead_code)]
+    pub fn host(&self) -> Result<Option<&str>> {
+        if let Some(host) = self.header("host") {
+            Ok(Some(try!(from_utf8(host))))
+        } else {
+            Ok(None)
+        }
+    }
+
     /// Get the origin of the request if it comes from a browser.
     #[allow(dead_code)]
     pub fn origin(&self) -> Result<Option<&str>> {
